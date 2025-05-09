@@ -4,6 +4,7 @@ from app import db
 from app.models import Estudiante, Curso, Grupo, Supervisor, Serie, Ejercicio, Ejercicio_asignado, serie_asignada, inscripciones, estudiantes_grupos, supervisores_grupos
 from app.utils.verification import verify_estudiante
 from app.utils.file_handling import calcular_calificacion
+from app.utils.ejercicios import guardar_y_ejecutar_tests, procesar_resultado_test
 from funciones_archivo.manejoCarpetas import crearArchivadorEstudiante, agregarCarpetaSerieEstudiante, agregarCarpetaEjercicioEstudiante
 from funciones_archivo.manejoMaven import ejecutarTestUnitario
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -164,33 +165,9 @@ def detallesEjerciciosEstudiantes(estudiante_id, serie_id, ejercicio_id):
                                 rutaEjercicioEstudiante = agregarCarpetaEjercicioEstudiante(rutaSerieEstudiante, ejercicio.id, ejercicio.path_ejercicio)
                                 current_app.logger.info(f'Ruta ejercicio estudiante: {rutaEjercicioEstudiante}')
                                 if os.path.exists(rutaEjercicioEstudiante):
-                                    for archivo_java in archivos_java:
-                                        rutaFinal = os.path.join(rutaEjercicioEstudiante, 'src/main/java/org/example')
-                                        if archivo_java and archivo_java.filename.endswith('.java'):
-                                            archivo_java.save(os.path.join(rutaFinal, archivo_java.filename))
-                                            current_app.logger.info(f'Archivo guardado en: {rutaFinal}')
-                                    resultadoTest = ejecutarTestUnitario(rutaEjercicioEstudiante)
-                                    current_app.logger.info(f'Resultado test: {resultadoTest}')
-                                    if resultadoTest == 'BUILD SUCCESS':
-                                        current_app.logger.info(f'El test fue exitoso')
-                                        nuevoEjercicioAsignado.contador += 1
-                                        nuevoEjercicioAsignado.ultimo_envio = rutaFinal
-                                        nuevoEjercicioAsignado.fecha_ultimo_envio = datetime.now()
-                                        nuevoEjercicioAsignado.test_output = json.dumps(resultadoTest)
-                                        nuevoEjercicioAsignado.estado = True
-                                        db.session.commit()
-                                        errores = {"tipo": "success", "titulo": "Todos los test aprobados", "mensaje": resultadoTest}
-                                        return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, errores=errores, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
-                                    else:
-                                        current_app.logger.info(f'El test no fue exitoso')
-                                        nuevoEjercicioAsignado.contador += 1
-                                        nuevoEjercicioAsignado.ultimo_envio = rutaFinal
-                                        nuevoEjercicioAsignado.fecha_ultimo_envio = datetime.now()
-                                        nuevoEjercicioAsignado.test_output = json.dumps(resultadoTest)
-                                        nuevoEjercicioAsignado.estado = False
-                                        db.session.commit()
-                                        errores = {"tipo": "danger", "titulo": "Errores en la ejecución de pruebas unitarias", "mensaje": resultadoTest}
-                                        return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, errores=errores, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
+                                    resultadoTest, rutaFinal = guardar_y_ejecutar_tests(archivos_java, rutaEjercicioEstudiante)
+                                    errores = procesar_resultado_test(ejercicioAsignado, resultadoTest, rutaFinal)
+                                    return render_template('detallesEjerciciosEstudiante.html',serie=serie,ejercicio=ejercicio,errores=errores,estudiante_id=estudiante_id,enunciado=enunciado_html,ejercicios=ejercicios,ejercicios_asignados=ejercicios_asignados,colors_info=colors_info,calificacion=calificacion)
                             except Exception as e:
                                 current_app.logger.error(f'Ocurrió un error al agregar la carpeta del ejercicio: {str(e)}')
                                 db.session.rollback()
@@ -210,30 +187,9 @@ def detallesEjerciciosEstudiantes(estudiante_id, serie_id, ejercicio_id):
                         try:
                             rutaEjercicioEstudiante = agregarCarpetaEjercicioEstudiante(rutaSerieEstudiante, ejercicio.id, ejercicio.path_ejercicio)
                             if os.path.exists(rutaEjercicioEstudiante):
-                                for archivo_java in archivos_java:
-                                    rutaFinal = os.path.join(rutaEjercicioEstudiante, 'src/main/java/org/example')
-                                    if archivo_java and archivo_java.filename.endswith('.java'):
-                                        archivo_java.save(os.path.join(rutaFinal, archivo_java.filename))
-                                resultadoTest = ejecutarTestUnitario(rutaEjercicioEstudiante)
-                                if resultadoTest == 'BUILD SUCCESS':
-                                    ejercicioAsignado.contador += 1
-                                    ejercicioAsignado.ultimo_envio = rutaFinal
-                                    ejercicioAsignado.fecha_ultimo_envio = datetime.now()
-                                    ejercicioAsignado.test_output = json.dumps(resultadoTest)
-                                    ejercicioAsignado.estado = True
-                                    db.session.commit()
-                                    errores = {"tipo": "success", "titulo": "Todos los test aprobados", "mensaje": resultadoTest}
-                                    return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, errores=errores, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
-                                else:
-                                    ejercicioAsignado.contador += 1
-                                    ejercicioAsignado.ultimo_envio = rutaFinal
-                                    ejercicioAsignado.fecha_ultimo_envio = datetime.now()
-                                    ejercicioAsignado.test_output = json.dumps(resultadoTest)
-                                    ejercicioAsignado.estado = False
-                                    db.session.commit()
-                                    errores = {"tipo": "danger", "titulo": "Errores en la ejecución de pruebas unitarias", "mensaje": resultadoTest}
-                                    current_app.logger.info(f'resultadoTest: {resultadoTest}')
-                                    return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, errores=errores, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
+                                resultadoTest, rutaFinal = guardar_y_ejecutar_tests(archivos_java, rutaEjercicioEstudiante)
+                                errores = procesar_resultado_test(ejercicioAsignado, resultadoTest, rutaFinal)
+                                return render_template('detallesEjerciciosEstudiante.html',serie=serie,ejercicio=ejercicio,errores=errores,estudiante_id=estudiante_id,enunciado=enunciado_html,ejercicios=ejercicios,ejercicios_asignados=ejercicios_asignados,colors_info=colors_info,calificacion=calificacion)
                         except Exception as e:
                             db.session.rollback()
                             current_app.logger.error(f'Ocurrió un error al agregar la carpeta del ejercicio: {str(e)}')
