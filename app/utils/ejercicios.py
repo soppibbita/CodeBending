@@ -3,6 +3,7 @@ from flask import current_app
 from app import db
 import json
 from datetime import datetime
+from app.models import Ejercicio_asignado
 
 def guardar_y_ejecutar_tests(archivos_java, ruta_ejercicio):
     ruta_final = os.path.join(ruta_ejercicio, 'src/main/java/org/example')
@@ -38,3 +39,17 @@ def procesar_resultado_test(ejercicio_asignado, resultado_test, ruta_final):
     }
 
     return errores
+
+def crear_nuevo_ejercicio_asignado(estudiante_id, ejercicio_id):
+    nuevo = Ejercicio_asignado(
+        id_estudiante=estudiante_id,
+        id_ejercicio=ejercicio_id,
+        contador=0,
+        estado=False,
+        ultimo_envio=None,
+        fecha_ultimo_envio=datetime.now(),
+        test_output=None
+    )
+    db.session.add(nuevo)
+    db.session.flush()
+    return nuevo

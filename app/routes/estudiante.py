@@ -4,7 +4,7 @@ from app import db
 from app.models import Estudiante, Curso, Grupo, Supervisor, Serie, Ejercicio, Ejercicio_asignado, serie_asignada, inscripciones, estudiantes_grupos, supervisores_grupos
 from app.utils.verification import verify_estudiante
 from app.utils.file_handling import calcular_calificacion
-from app.utils.ejercicios import guardar_y_ejecutar_tests, procesar_resultado_test
+from app.utils.ejercicios import guardar_y_ejecutar_tests, procesar_resultado_test, crear_nuevo_ejercicio_asignado
 from funciones_archivo.manejoCarpetas import crearArchivadorEstudiante, agregarCarpetaSerieEstudiante, agregarCarpetaEjercicioEstudiante
 from funciones_archivo.manejoMaven import ejecutarTestUnitario
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -147,56 +147,29 @@ def detallesEjerciciosEstudiantes(estudiante_id, serie_id, ejercicio_id):
             ejercicioAsignado = Ejercicio_asignado.query.filter_by(id_estudiante=estudiante_id, id_ejercicio=ejercicio.id).first()
             if not ejercicioAsignado:
                 try:
-                    nuevoEjercicioAsignado = Ejercicio_asignado(
-                        id_estudiante=estudiante_id,
-                        id_ejercicio=ejercicio_id,
-                        contador=0,
-                        estado=False,
-                        ultimo_envio=None,
-                        fecha_ultimo_envio=datetime.now(),
-                        test_output=None)
-                    db.session.add(nuevoEjercicioAsignado)
-                    db.session.flush()
-                    try:
-                        rutaSerieEstudiante = agregarCarpetaSerieEstudiante(rutaArchivador, serie.id)
-                        current_app.logger.info(f'Ruta serie estudiante: {rutaSerieEstudiante}')
-                        if os.path.exists(rutaSerieEstudiante):
-                            try:
-                                rutaEjercicioEstudiante = agregarCarpetaEjercicioEstudiante(rutaSerieEstudiante, ejercicio.id, ejercicio.path_ejercicio)
-                                current_app.logger.info(f'Ruta ejercicio estudiante: {rutaEjercicioEstudiante}')
-                                if os.path.exists(rutaEjercicioEstudiante):
-                                    resultadoTest, rutaFinal = guardar_y_ejecutar_tests(archivos_java, rutaEjercicioEstudiante)
-                                    errores = procesar_resultado_test(ejercicioAsignado, resultadoTest, rutaFinal)
-                                    return render_template('detallesEjerciciosEstudiante.html',serie=serie,ejercicio=ejercicio,errores=errores,estudiante_id=estudiante_id,enunciado=enunciado_html,ejercicios=ejercicios,ejercicios_asignados=ejercicios_asignados,colors_info=colors_info,calificacion=calificacion)
-                            except Exception as e:
-                                current_app.logger.error(f'Ocurrió un error al agregar la carpeta del ejercicio: {str(e)}')
-                                db.session.rollback()
-                                return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
-                    except Exception as e:
-                        current_app.logger.error(f'Ocurrió un error al agregar la carpeta de la serie: {str(e)}')
-                        db.session.rollback()
-                        return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
+                    ejercicioAsignado = crear_nuevo_ejercicio_asignado(estudiante_id, ejercicio_id)
                 except Exception as e:
                     current_app.logger.error(f'Ocurrió un error al agregar el ejercicio asignado: {str(e)}')
                     db.session.rollback()
                     return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
-            else:
-                try:
-                    rutaSerieEstudiante = agregarCarpetaSerieEstudiante(rutaArchivador, serie.id)
-                    if os.path.exists(rutaSerieEstudiante):
-                        try:
-                            rutaEjercicioEstudiante = agregarCarpetaEjercicioEstudiante(rutaSerieEstudiante, ejercicio.id, ejercicio.path_ejercicio)
-                            if os.path.exists(rutaEjercicioEstudiante):
-                                resultadoTest, rutaFinal = guardar_y_ejecutar_tests(archivos_java, rutaEjercicioEstudiante)
-                                errores = procesar_resultado_test(ejercicioAsignado, resultadoTest, rutaFinal)
-                                return render_template('detallesEjerciciosEstudiante.html',serie=serie,ejercicio=ejercicio,errores=errores,estudiante_id=estudiante_id,enunciado=enunciado_html,ejercicios=ejercicios,ejercicios_asignados=ejercicios_asignados,colors_info=colors_info,calificacion=calificacion)
-                        except Exception as e:
-                            db.session.rollback()
-                            current_app.logger.error(f'Ocurrió un error al agregar la carpeta del ejercicio: {str(e)}')
-                            return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, errores=resultadoTest, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
-                except Exception as e:
-                    current_app.logger.error(f'Ocurrió un error al agregar la carpeta de la serie: {str(e)}')
-                    db.session.rollback()
+
+            try:
+                rutaSerieEstudiante = agregarCarpetaSerieEstudiante(rutaArchivador, serie.id)
+                if os.path.exists(rutaSerieEstudiante):
+                    try:
+                        rutaEjercicioEstudiante = agregarCarpetaEjercicioEstudiante(rutaSerieEstudiante, ejercicio.id, ejercicio.path_ejercicio)
+                        if os.path.exists(rutaEjercicioEstudiante):
+                            resultadoTest, rutaFinal = guardar_y_ejecutar_tests(archivos_java, rutaEjercicioEstudiante)
+                            errores = procesar_resultado_test(ejercicioAsignado, resultadoTest, rutaFinal)
+                            return render_template('detallesEjerciciosEstudiante.html',serie=serie,ejercicio=ejercicio,errores=errores,estudiante_id=estudiante_id,enunciado=enunciado_html,ejercicios=ejercicios,ejercicios_asignados=ejercicios_asignados,colors_info=colors_info,calificacion=calificacion)
+                    except Exception as e:
+                        db.session.rollback()
+                        current_app.logger.error(f'Ocurrió un error al agregar la carpeta del ejercicio: {str(e)}')
+                        return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, errores=resultadoTest, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
+            except Exception as e:
+                current_app.logger.error(f'Ocurrió un error al agregar la carpeta de la serie: {str(e)}')
+                db.session.rollback()
+                return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
 
     return render_template('detallesEjerciciosEstudiante.html', serie=serie, ejercicio=ejercicio, estudiante_id=estudiante_id, enunciado=enunciado_html, ejercicios=ejercicios, ejercicios_asignados=ejercicios_asignados, colors_info=colors_info, calificacion=calificacion)
 
