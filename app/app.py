@@ -23,32 +23,27 @@ from logging.config import dictConfig
 from ansi2html import Ansi2HTMLConverter
 import json
 
+# inicializar la aplicacion
+app = Flask(__name__)
+init_app(app)
+app.config['SECRET_KEY'] = 'secret-key-goes-here'
 
-dictConfig({
-    'version': 1,
-    'formatters': {
-        'default': {
-            'format': '[%(asctime)s] [%(levelname)s] [%(module)s] %(message)s',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': 'errores.log',
-            'formatter': 'default',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'default',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',  # Puedes ajustar este nivel según tus necesidades
-            'propagate': True,
-        },
-    },
-})
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Nombre de la vista para iniciar sesión
+
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=120)
+
+# Ruta donde se guardan los archivos subidos para los ejercicios
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'md', 'xml', 'csv', 'png', 'jpg', 'jpeg'}
+
+# Encuentra la ruta del directorio del archivo actual
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Define la ruta UPLOAD_FOLDER en relación a ese directorio
+UPLOAD_FOLDER = os.path.join(current_directory, "uploads")
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
