@@ -63,7 +63,7 @@ def register():
     # valida los datos
     if not nombres or not apellidos or not correo or not password:
         flash('Todos los campos son requeridos.', 'danger')
-        return render_template('register.html')  
+        return render_template('registersupervisor.html')  
     
     # comprueba si el correo ya existe
     supervisor = Supervisor.query.filter_by(correo=correo).first()
