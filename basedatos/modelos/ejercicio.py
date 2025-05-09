@@ -22,8 +22,8 @@ from logging.config import dictConfig
 from ansi2html import Ansi2HTMLConverter
 import json
 
-from ..app import app
-from ..utils import verify_supervisor, verify_estudiante, calcular_calificacion
+from ...app.app import app
+from ...app.utils import verify_supervisor, verify_estudiante, calcular_calificacion
 
 @app.route('/dashDocente/<int:supervisor_id>/serie/<int:serie_id>/ejercicio/<int:ejercicio_id>', methods=['GET','POST'])
 @login_required
