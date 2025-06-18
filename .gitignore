@@ -5,3 +5,8 @@ instance/
 ejerciciosEstudiantes/
 ejerciciosPropuestos/
 enunciadosEjercicios/
+pyproject.toml
+.python-version
+uv.lock
+.venv
+.vscode
