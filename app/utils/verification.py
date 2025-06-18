@@ -20,11 +20,3 @@ def verify_estudiante(estudiante_id):
         return False
     return True
 
-def verify_ayudante(supervisor_id):
-    if not isinstance(current_user, Supervisor):
-        flash('No tienes permiso para acceder a este dashboard. Debes ser un Supervisor.', 'danger')
-        return False
-    if current_user.id != supervisor_id:
-        flash('No tienes permiso para acceder a este dashboard.', 'danger')
-        return False
-    return True
