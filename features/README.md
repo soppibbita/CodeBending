@@ -27,6 +27,7 @@
 ## Features implementadas
 
 1. Login de usuarios con escenarios de éxito, error y logout.
+2. Registro de estudiantes y asignación a grupos con escenarios de evaluar el csv de registro, evitar duplicidad de datos, fallos en la base de datos y errores de falta de datos.
 
 ## Notas
 
