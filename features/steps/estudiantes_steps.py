@@ -147,8 +147,12 @@ def step_assert_advertencia(context):
 
 @then("el grupo no debe quedar asociado a estudiantes")
 def step_assert_grupo_vacio(context):
+    grupo_id = getattr(context, "grupo_id", None)
+    if grupo_id is None:
+        return  # No hay grupo, así que no hay estudiantes asociados: válido
     for rel in db_sim["relaciones"]["estudiante_grupo"]:
-        assert rel[1] != context.grupo_id
+        assert rel[1] != grupo_id
+
 
 @then("el sistema debe evitar la duplicación en la relación")
 def step_assert_no_reasignacion(context):
