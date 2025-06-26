@@ -10,3 +10,4 @@ pyproject.toml
 uv.lock
 .venv
 .vscode
+*.bak
