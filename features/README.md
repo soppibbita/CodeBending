@@ -22,6 +22,12 @@
    ```bash
    behave features/login.feature
    ```
+    ```bash
+   behave features/estudiantes.feature
+   ```
+    ```bash
+   behave features/ejercicios.feature
+   ```
 
 
 ## Features implementadas
