@@ -41,6 +41,12 @@ Important: There seems to be a problem with path management under Windows, so I 
    ```bash
    behave features/login.feature
    ```
+    ```bash
+   behave features/estudiantes.feature
+   ```
+    ```bash
+   behave features/ejercicios.feature
+   ```
 
 
 ## Features implementadas
