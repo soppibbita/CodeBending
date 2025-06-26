@@ -30,7 +30,7 @@ Característica: Gestión de series, ejercicios y cursos por parte del superviso
     Dado que existe un supervisor con ID 1 autenticado
     Y que se proporciona un nombre válido para la serie
     Cuando el supervisor crea una nueva serie
-    Entonces el sistema debe crear un nuevo registro en la base de datos
+    Entonces el sistema debe crear un nuevo registro de serie en la base de datos
     Y debe crear una carpeta para la serie
     Y debe mostrar un mensaje de tipo "success"
 
@@ -92,7 +92,7 @@ Característica: Gestión de series, ejercicios y cursos por parte del superviso
     Dado que existe un supervisor con ID 1 autenticado
     Y que se proporciona un nombre válido para el curso
     Cuando el supervisor crea un nuevo curso
-    Entonces el sistema debe crear un nuevo registro en la base de datos
+    Entonces el sistema debe crear un nuevo registro de curso en la base de datos
     Y debe mostrar un mensaje de tipo "success"
 
   Escenario: Asignar estudiantes a un grupo exitosamente
