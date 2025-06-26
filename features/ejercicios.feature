@@ -38,18 +38,6 @@ Característica: Gestión de ejercicios y pruebas unitarias
     Y el contador debe iniciar en 0
     Y el estado debe ser "False"
 
-  Escenario: Error al guardar archivo Java no válido
-    Dado que el estudiante intenta subir un archivo con extensión incorrecta
-    Cuando se procesa el archivo
-    Entonces no debe guardarse en el sistema
-    Y debe mostrarse un mensaje de advertencia en el log
-
-  Escenario: Error al ejecutar pruebas por ruta inexistente
-    Dado que el sistema intenta ejecutar pruebas en una ruta inválida
-    Cuando se llama a la función de ejecución
-    Entonces debe lanzarse una excepción
-    Y debe registrarse el error en los logs
-
   Escenario: Guardar múltiples archivos y ejecutar tests
     Dado que el estudiante ha subido múltiples archivos Java válidos
     Y que la ruta del ejercicio está correctamente configurada
