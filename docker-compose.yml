@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./ejerciciosEstudiantes:/app/ejerciciosEstudiantes
+      - ./ejerciciosPropuestos:/app/ejerciciosPropuestos
+      - ./enunciadosEjercicios:/app/enunciadosEjercicios
+      - ./uploads:/app/uploads
+    environment:
+      - PYTHONUNBUFFERED=1

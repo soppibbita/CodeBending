@@ -17,6 +17,37 @@ You can encounter an example of exercise for the platform here : https://github.
 
 Important: There seems to be a problem with path management under Windows, so I recommend using Linux (or correcting the problem).
 
+# Ejecutar con Docker
+
+Para ejecutar el proyecto usando Docker, primero construir y levantar los contenedores:
+```bash
+docker-compose up --build
+```
+
+Luego crear la base de datos (solo la primera vez):
+```bash
+docker-compose exec web python crear_db.py
+```
+
+Después conectarse a http://127.0.0.1:3000/registerSupervisor para crear la primera cuenta de supervisor.
+
+# Calidad de Código
+
+Para formatear código con black:
+```bash
+make format
+```
+
+Para ejecutar análisis con flake8:
+```bash
+make lint
+```
+
+Para ejecutar ambos análisis:
+```bash
+make check
+```
+
 # Pruebas de Aceptación 
 
 ## Como ejecutarlas

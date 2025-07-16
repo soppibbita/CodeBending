@@ -11,3 +11,5 @@ uv.lock
 .venv
 .vscode
 *.bak
+data/*
+!data/.gitkeep

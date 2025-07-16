@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Git
+.git/
+.gitignore
+
+# JavaScript (no necesario)
+node_modules/
+package.json
+package-lock.json
+
+# Testing
+tests/
+features/
+behave.ini
+
+# Database (montada como volumen)
+database.db
+*.db
+
+# Logs (montados como volumen)
+errores.log
+*.log
+
+# Documentación y configuración de desarrollo
+CLAUDE.md
+README.md
+.flake8
+pyproject.toml
+Makefile
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
