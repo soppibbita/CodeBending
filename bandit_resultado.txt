@@ -1,0 +1,51 @@
+Run started:2025-07-16 18:34:11.240332
+
+Test results:
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'secret-key-goes-here'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b105_hardcoded_password_string.html
+   Location: app\config.py:5:17
+4	class Config:
+5	    SECRET_KEY = 'secret-key-goes-here'
+6	    PERMANENT_SESSION_LIFETIME = timedelta(minutes=120)
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: funciones_archivo\manejoMaven.py:1:0
+1	import re, os, subprocess
+2	from ansi2html import Ansi2HTMLConverter
+3	from bs4 import BeautifulSoup
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: funciones_archivo\manejoMaven.py:7:16
+6	    comando = ['mvn', 'clean', 'test']
+7	    resultado = subprocess.run(comando, cwd=rutaEjercicioEstudiante, capture_output=True, text=True)
+8	
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 1423
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 3
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 1
+		High: 2
+Files skipped (0):
